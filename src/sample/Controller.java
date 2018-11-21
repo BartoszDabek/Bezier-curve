@@ -31,5 +31,10 @@ public class Controller {
 
         mainCanvas.setHeight(mainHeight);
         mainCanvas.setWidth(mainWidth);
+
+        canvasHolder.setOnMouseClicked(event -> {
+            Point point = new Point(event.getX(), event.getY());
+            new Circle(point,5).drawCircle(gc);
+        });
     }
 }
