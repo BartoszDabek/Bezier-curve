@@ -7,10 +7,13 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+
 public class Controller {
 
     private static final double mainWidth = 1200;
     private static final double mainHeight = 600;
+    private ArrayList<Circle> circles = new ArrayList<>();
 
     @FXML
     private Canvas mainCanvas;
@@ -33,8 +36,19 @@ public class Controller {
         mainCanvas.setWidth(mainWidth);
 
         canvasHolder.setOnMouseClicked(event -> {
+            gc.beginPath();
+            for (Circle circle: circles) {
+                Point center = circle.getCenter();
+                gc.lineTo(center.getX(), center.getY());
+            }
+            gc.stroke();
+        });
+
+        canvasHolder.setOnMouseReleased(event -> {
             Point point = new Point(event.getX(), event.getY());
-            new Circle(point,5).drawCircle(gc);
+            Circle circle = new Circle(point, 5);
+            circle.drawCircle(gc);
+            circles.add(circle);
         });
     }
 }

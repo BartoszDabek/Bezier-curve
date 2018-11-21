@@ -17,4 +17,12 @@ class Circle {
         gc.setStroke(Color.BLACK);
         gc.strokeOval(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2);
     }
+
+    public Point getCenter() {
+        return center;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
 }
