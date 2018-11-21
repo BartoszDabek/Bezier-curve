@@ -35,20 +35,30 @@ public class Controller {
         mainCanvas.setHeight(mainHeight);
         mainCanvas.setWidth(mainWidth);
 
-        canvasHolder.setOnMouseClicked(event -> {
-            gc.beginPath();
+        canvasHolder.setOnMouseDragged(event -> {
             for (Circle circle: circles) {
-                Point center = circle.getCenter();
-                gc.lineTo(center.getX(), center.getY());
+                if (Math.abs(event.getX() - circle.getCenter().getX()) < 20) {
+                    canvasHolder.getChildren().remove(circle.getCanvas());
+                }
             }
-            gc.stroke();
+        });
+
+        canvasHolder.setOnMouseClicked(event -> {
+            if (circles.size() > 1) {
+                Circle circle1 = circles.get(circles.size() - 2);
+                Point center = circle1.getCenter();
+                Line line = new Line(center, new Point(event.getX(), event.getY()));
+                line.drawLine();
+                canvasHolder.getChildren().add(line.getCanvas());
+            }
         });
 
         canvasHolder.setOnMouseReleased(event -> {
             Point point = new Point(event.getX(), event.getY());
             Circle circle = new Circle(point, 5);
-            circle.drawCircle(gc);
+            circle.drawCircle();
             circles.add(circle);
+            canvasHolder.getChildren().add(circle.getCanvas());
         });
     }
 }

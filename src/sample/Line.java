@@ -3,28 +3,23 @@ package sample;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
-class Circle {
+class Line {
 
-    private Point center;
-    private double radius;
+    private Point start;
+    private Point end;
     private Canvas canvas;
 
-    Circle(Point center, double radius) {
-        this.center = center;
-        this.radius = radius;
+    Line(Point start, Point end) {
+        this.start = start;
+        this.end = end;
     }
 
-    void drawCircle() {
+    void drawLine() {
         canvas = new Canvas();
         canvas.setHeight(600);
         canvas.setWidth(1215);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.strokeOval(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2);
-    }
-
-
-    Point getCenter() {
-        return center;
+        gc.strokeLine(start.getX(), start.getY(), end.getX(), end.getY());
     }
 
     Canvas getCanvas() {
