@@ -22,6 +22,9 @@ class Circle {
         gc.strokeOval(center.getX() - radius, center.getY() - radius, radius * 2, radius * 2);
     }
 
+    public void setCenter(Point center) {
+        this.center = center;
+    }
 
     Point getCenter() {
         return center;
