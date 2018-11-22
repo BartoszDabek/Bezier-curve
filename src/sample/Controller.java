@@ -22,6 +22,7 @@ public class Controller {
     private Optional<Circle> tempCircle = Optional.empty();
     private Optional<Line> tempLineStart = Optional.empty();
     private Optional<Line> tempLineEnd = Optional.empty();
+    private Optional<Canvas> tempBezier = Optional.empty();
     private Circle lastAddedCircle;
     private static Controller instance;
 
@@ -46,21 +47,27 @@ public class Controller {
         mainCanvas.setHeight(MAIN_HEIGHT);
         mainCanvas.setWidth(MAIN_WIDTH);
 
-        canvasHolder.setOnMouseDragged(event -> tempCircle.ifPresent(circle -> {
-            circle.setCenter(new Point(event.getX(), event.getY()));
-            circle.redraw();
+        canvasHolder.setOnMouseDragged(event -> {
 
-            tempLineStart.ifPresent(line -> {
-                line.setStart(new Point(event.getX(), event.getY()));
-                line.redraw();
+            drawBezier();
+
+
+            tempCircle.ifPresent(circle -> {
+                circle.setCenter(new Point(event.getX(), event.getY()));
+                circle.redraw();
+
+                tempLineStart.ifPresent(line -> {
+                    line.setStart(new Point(event.getX(), event.getY()));
+                    line.redraw();
+                });
+
+
+                tempLineEnd.ifPresent(line -> {
+                    line.setEnd(new Point(event.getX(), event.getY()));
+                    line.redraw();
+                });
             });
-
-
-            tempLineEnd.ifPresent(line -> {
-                line.setEnd(new Point(event.getX(), event.getY()));
-                line.redraw();
-            });
-        }));
+        });
 
         canvasHolder.setOnMousePressed(event -> {
             if (!tempCircle.isPresent()) {
@@ -111,6 +118,39 @@ public class Controller {
             tempLineStart = Optional.empty();
             tempLineEnd = Optional.empty();
         });
+    }
+
+    private void drawBezier() {
+        if (circles.size() > 2) {
+            if (tempBezier.isPresent()) {
+                Canvas canvas = tempBezier.get();
+                Controller.getInstance().getCanvasHolder().getChildren().remove(canvas);
+                canvas.getGraphicsContext2D().clearRect(0, 0, 1215, 600);
+            }
+
+            BezierCurve bezierCurve = new BezierCurve(circles);
+            int iterations = 20;
+            double[] xPoints = new double[iterations + 1];
+            double[] yPoints = new double[iterations + 1];
+
+            double u = 0.0d;
+            double m = 1 / (double) iterations;
+
+            for (int i = 0; i <= iterations; i++) {
+                xPoints[i] = bezierCurve.xValueAt(u);
+                yPoints[i] = bezierCurve.yValueAt(u);
+                u += m;
+            }
+
+            // Draw curve
+            Canvas canvas = new Canvas(1215, 600);
+            tempBezier = Optional.of(canvas);
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            Controller.getInstance().getCanvasHolder().getChildren().add(canvas);
+
+            gc.setStroke(Color.ORANGE);
+            gc.strokePolyline(xPoints, yPoints, iterations + 1);
+        }
     }
 
     private static void setInstance(Controller instance) {
