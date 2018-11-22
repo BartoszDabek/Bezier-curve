@@ -1,6 +1,7 @@
 package sample.shape;
 
 import javafx.scene.canvas.GraphicsContext;
+import sample.Controller;
 
 public class Line extends AbstractShape {
 
@@ -15,6 +16,13 @@ public class Line extends AbstractShape {
     public void drawLine() {
         GraphicsContext gc = getCanvas().getGraphicsContext2D();
         gc.strokeLine(start.getX(), start.getY(), end.getX(), end.getY());
+        Controller.getInstance().getCanvasHolder().getChildren().add(getCanvas());
+    }
+
+    public void redraw() {
+        Controller.getInstance().getCanvasHolder().getChildren().remove(getCanvas());
+        getCanvas().getGraphicsContext2D().clearRect(0, 0, AbstractShape.OFFSET_WIDTH, AbstractShape.OFFSET_HEIGHT);
+        drawLine();
     }
 
     public Point getStart() {

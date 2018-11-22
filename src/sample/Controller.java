@@ -6,7 +6,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import sample.shape.AbstractShape;
 import sample.shape.Circle;
 import sample.shape.Line;
 import sample.shape.Point;
@@ -24,6 +23,7 @@ public class Controller {
     private Optional<Line> tempLineStart = Optional.empty();
     private Optional<Line> tempLineEnd = Optional.empty();
     private Circle lastAddedCircle;
+    private static Controller instance;
 
     @FXML
     private Canvas mainCanvas;
@@ -34,6 +34,7 @@ public class Controller {
 
     @FXML
     public void initialize() {
+        setInstance(this);
         canvasHolder.setOnMouseMoved(event -> coordinates.setText("X: " + event.getX() + "  Y: " + event.getY()));
         canvasHolder.setMaxHeight(MAIN_HEIGHT);
         canvasHolder.setMaxWidth(MAIN_WIDTH);
@@ -46,30 +47,18 @@ public class Controller {
         mainCanvas.setWidth(MAIN_WIDTH);
 
         canvasHolder.setOnMouseDragged(event -> tempCircle.ifPresent(circle -> {
-            canvasHolder.getChildren().remove(circle.getCanvas());
-            circle.getCanvas().getGraphicsContext2D().clearRect(0, 0, AbstractShape.OFFSET_WIDTH, AbstractShape.OFFSET_HEIGHT);
-
             circle.setCenter(new Point(event.getX(), event.getY()));
-            circle.drawCircle();
-            canvasHolder.getChildren().add(circle.getCanvas());
+            circle.redraw();
 
             tempLineStart.ifPresent(line -> {
-                canvasHolder.getChildren().remove(line.getCanvas());
-                line.getCanvas().getGraphicsContext2D().clearRect(0, 0, AbstractShape.OFFSET_WIDTH, AbstractShape.OFFSET_HEIGHT);
-
                 line.setStart(new Point(event.getX(), event.getY()));
-                line.drawLine();
-                canvasHolder.getChildren().add(line.getCanvas());
+                line.redraw();
             });
 
 
             tempLineEnd.ifPresent(line -> {
-                canvasHolder.getChildren().remove(line.getCanvas());
-                line.getCanvas().getGraphicsContext2D().clearRect(0, 0, AbstractShape.OFFSET_WIDTH, AbstractShape.OFFSET_HEIGHT);
-
                 line.setEnd(new Point(event.getX(), event.getY()));
-                line.drawLine();
-                canvasHolder.getChildren().add(line.getCanvas());
+                line.redraw();
             });
         }));
 
@@ -104,7 +93,6 @@ public class Controller {
                 Circle circle = new Circle(point, 5);
                 circle.drawCircle();
                 circles.add(circle);
-                canvasHolder.getChildren().add(circle.getCanvas());
                 lastAddedCircle = circle;
             }
             tempCircle = Optional.empty();
@@ -117,12 +105,23 @@ public class Controller {
                     Line line = new Line(center, new Point(event.getX(), event.getY()));
                     line.drawLine();
                     lines.add(line);
-                    canvasHolder.getChildren().add(line.getCanvas());
                 }
             }
 
             tempLineStart = Optional.empty();
             tempLineEnd = Optional.empty();
         });
+    }
+
+    private static void setInstance(Controller instance) {
+        Controller.instance = instance;
+    }
+
+    public static Controller getInstance() {
+        return instance;
+    }
+
+    public StackPane getCanvasHolder() {
+        return canvasHolder;
     }
 }

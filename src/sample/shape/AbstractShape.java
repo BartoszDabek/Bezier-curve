@@ -4,8 +4,8 @@ import javafx.scene.canvas.Canvas;
 
 public abstract class AbstractShape {
 
-    public static final int OFFSET_WIDTH = 1215;
-    public static final int OFFSET_HEIGHT = 600;
+    static final int OFFSET_WIDTH = 1215;
+    static final int OFFSET_HEIGHT = 600;
     private Canvas canvas;
 
     AbstractShape() {
@@ -14,7 +14,7 @@ public abstract class AbstractShape {
         this.canvas.setWidth(OFFSET_WIDTH);
     }
 
-    public Canvas getCanvas() {
+    Canvas getCanvas() {
         return canvas;
     }
 }
