@@ -6,16 +6,24 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import sample.shape.AbstractShape;
+import sample.shape.Circle;
+import sample.shape.Line;
+import sample.shape.Point;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
 public class Controller {
 
-    private static final double mainWidth = 1200;
-    private static final double mainHeight = 600;
+    private static final double MAIN_WIDTH = 1200;
+    private static final double MAIN_HEIGHT = 600;
     private ArrayList<Circle> circles = new ArrayList<>();
+    private ArrayList<Line> lines = new ArrayList<>();
     private Optional<Circle> tempCircle = Optional.empty();
+    private Optional<Line> tempLineStart = Optional.empty();
+    private Optional<Line> tempLineEnd = Optional.empty();
+    private Circle lastAddedCircle;
 
     @FXML
     private Canvas mainCanvas;
@@ -27,36 +35,65 @@ public class Controller {
     @FXML
     public void initialize() {
         canvasHolder.setOnMouseMoved(event -> coordinates.setText("X: " + event.getX() + "  Y: " + event.getY()));
-        canvasHolder.setMaxHeight(mainHeight);
-        canvasHolder.setMaxWidth(mainWidth);
+        canvasHolder.setMaxHeight(MAIN_HEIGHT);
+        canvasHolder.setMaxWidth(MAIN_WIDTH);
 
         GraphicsContext gc = mainCanvas.getGraphicsContext2D();
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, this.mainCanvas.getWidth(), this.mainCanvas.getHeight());
 
-        mainCanvas.setHeight(mainHeight);
-        mainCanvas.setWidth(mainWidth);
+        mainCanvas.setHeight(MAIN_HEIGHT);
+        mainCanvas.setWidth(MAIN_WIDTH);
 
-        canvasHolder.setOnMouseDragged(event -> {
-            tempCircle.ifPresent(circle -> {
-                circles.remove(circle);
-                canvasHolder.getChildren().remove(circle.getCanvas());
-                circle.getCanvas().getGraphicsContext2D().clearRect(0, 0, 1215, 600);
+        canvasHolder.setOnMouseDragged(event -> tempCircle.ifPresent(circle -> {
+            canvasHolder.getChildren().remove(circle.getCanvas());
+            circle.getCanvas().getGraphicsContext2D().clearRect(0, 0, AbstractShape.OFFSET_WIDTH, AbstractShape.OFFSET_HEIGHT);
 
-                circles.add(circle);
+            circle.setCenter(new Point(event.getX(), event.getY()));
+            circle.drawCircle();
+            canvasHolder.getChildren().add(circle.getCanvas());
 
-                circle.setCenter(new Point(event.getX(), event.getY()));
-                circle.drawCircle();
-                canvasHolder.getChildren().add(circle.getCanvas());
+            tempLineStart.ifPresent(line -> {
+                canvasHolder.getChildren().remove(line.getCanvas());
+                line.getCanvas().getGraphicsContext2D().clearRect(0, 0, AbstractShape.OFFSET_WIDTH, AbstractShape.OFFSET_HEIGHT);
+
+                line.setStart(new Point(event.getX(), event.getY()));
+                line.drawLine();
+                canvasHolder.getChildren().add(line.getCanvas());
             });
-        });
+
+
+            tempLineEnd.ifPresent(line -> {
+                canvasHolder.getChildren().remove(line.getCanvas());
+                line.getCanvas().getGraphicsContext2D().clearRect(0, 0, AbstractShape.OFFSET_WIDTH, AbstractShape.OFFSET_HEIGHT);
+
+                line.setEnd(new Point(event.getX(), event.getY()));
+                line.drawLine();
+                canvasHolder.getChildren().add(line.getCanvas());
+            });
+        }));
 
         canvasHolder.setOnMousePressed(event -> {
-            for (Circle circle: circles) {
-                if (Math.abs(event.getX() - circle.getCenter().getX()) < 20 &&
-                        Math.abs(event.getY() - circle.getCenter().getY()) < 20) {
-                    tempCircle = Optional.of(circle);
-                    canvasHolder.getChildren().remove(circle.getCanvas());
+            if (!tempCircle.isPresent()) {
+
+
+                for (Circle circle : circles) {
+                    if (Math.abs(event.getX() - circle.getCenter().getX()) < 10 &&
+                            Math.abs(event.getY() - circle.getCenter().getY()) < 10) {
+                        tempCircle = Optional.of(circle);
+                    }
+                }
+
+                for (Line line : lines) {
+                    if (Math.abs(event.getX() - line.getStart().getX()) < 10 &&
+                            Math.abs(event.getY() - line.getStart().getY()) < 10) {
+                        tempLineStart = Optional.of(line);
+                    }
+
+                    if (Math.abs(event.getX() - line.getEnd().getX()) < 10 &&
+                            Math.abs(event.getY() - line.getEnd().getY()) < 10) {
+                        tempLineEnd = Optional.of(line);
+                    }
                 }
             }
         });
@@ -68,23 +105,24 @@ public class Controller {
                 circle.drawCircle();
                 circles.add(circle);
                 canvasHolder.getChildren().add(circle.getCanvas());
+                lastAddedCircle = circle;
             }
+            tempCircle = Optional.empty();
         });
 
         canvasHolder.setOnMouseReleased(event -> {
             if (!tempCircle.isPresent()) {
-
-
                 if (!circles.isEmpty()) {
-                    Circle circle = circles.get(circles.size() - 1);
-                    Point center = circle.getCenter();
+                    Point center = lastAddedCircle.getCenter();
                     Line line = new Line(center, new Point(event.getX(), event.getY()));
                     line.drawLine();
+                    lines.add(line);
                     canvasHolder.getChildren().add(line.getCanvas());
                 }
             }
 
-            tempCircle = Optional.empty();
+            tempLineStart = Optional.empty();
+            tempLineEnd = Optional.empty();
         });
     }
 }
