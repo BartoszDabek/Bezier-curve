@@ -2,7 +2,7 @@ package sample.shape;
 
 import javafx.scene.canvas.Canvas;
 
-public abstract class AbstractShape {
+abstract class AbstractShape {
 
     static final int OFFSET_WIDTH = 1215;
     static final int OFFSET_HEIGHT = 600;
