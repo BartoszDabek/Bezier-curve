@@ -12,6 +12,7 @@ import sample.shape.Line;
 import sample.shape.Point;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Controller {
@@ -19,7 +20,9 @@ public class Controller {
     private static final double MAIN_WIDTH = 1200;
     private static final double MAIN_HEIGHT = 600;
     private ArrayList<Circle> circles = new ArrayList<>();
+    private ArrayList<Circle> tempCircles = new ArrayList<>();
     private ArrayList<Line> lines = new ArrayList<>();
+    private ArrayList<BezierCurve> bezierCurves = new ArrayList<>();
     private Optional<Circle> tempCircle = Optional.empty();
     private Optional<Line> tempLineStart = Optional.empty();
     private Optional<Line> tempLineEnd = Optional.empty();
@@ -101,7 +104,17 @@ public class Controller {
                 Circle circle = new Circle(point, 5);
                 circle.drawCircle();
                 circles.add(circle);
+                tempCircles.add(circle);
                 lastAddedCircle = circle;
+
+                if (tempCircles.size() > 3) {
+                    BezierCurve bezierCurve = new BezierCurve(tempCircles);
+                    bezierCurves.add(bezierCurve);
+                    bezierCurve.draw();
+                    Circle circle1 = tempCircles.get(3);
+                    tempCircles = new ArrayList<>();
+                    tempCircles.add(circle1);
+                }
             }
             tempCircle = Optional.empty();
         });
@@ -122,12 +135,26 @@ public class Controller {
     }
 
     private void drawBezier() {
-        if (circles.size() > 2) {
+        if (!bezierCurves.isEmpty()) {
             tempBezier.ifPresent(BezierCurve::remove);
+            ArrayList<Circle> temp;
+            BezierCurve tempBezier;
+            for (int i=1; i<= bezierCurves.size(); i++) {
+                temp = new ArrayList<>();
+                tempBezier = bezierCurves.get(i-1);
+                for (int j=(i*3)-3;j<((i*3)-3) + 4; j++) {
+                    if (j < circles.size()) {
+                        Circle circle = circles.get(j);
+                        temp.add(circle);
+                    }
+                }
 
-            BezierCurve bezierCurve = new BezierCurve(circles);
-            bezierCurve.draw();
-            tempBezier = Optional.of(bezierCurve);
+                BezierCurve bezier2 = new BezierCurve(temp);
+                tempBezier.remove();
+                bezierCurves.add(i-1, bezier2);
+                bezierCurves.remove(tempBezier);
+                bezier2.draw();
+            }
         }
     }
 
