@@ -7,7 +7,7 @@ import java.util.List;
 
 public final class QuadraticBezier extends BezierCurve {
 
-    public QuadraticBezier(List<Circle> points) {
+    QuadraticBezier(List<Circle> points) {
         super(points);
     }
 
