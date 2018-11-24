@@ -6,29 +6,29 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.CubicCurveTo;
-import sample.shape.bezier.BezierCurve;
 import sample.shape.Circle;
 import sample.shape.Line;
 import sample.shape.Point;
+import sample.shape.bezier.BezierCurve;
 import sample.shape.bezier.CubicBezier;
 import sample.shape.bezier.QuadraticBezier;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Controller {
 
     private static final double MAIN_WIDTH = 1200;
     private static final double MAIN_HEIGHT = 600;
-    private ArrayList<Circle> canvasCircles = new ArrayList<>();
-    private ArrayList<Circle> tempCircles = new ArrayList<>();
-    private ArrayList<Line> lines = new ArrayList<>();
-    private ArrayList<BezierCurve> bezierCurves = new ArrayList<>();
+    private static final int CIRCLE_RADIUS = 5;
+    private List<Circle> canvasCircles = new ArrayList<>();
+    private List<Circle> tempCircles = new ArrayList<>();
+    private List<Line> lines = new ArrayList<>();
+    private List<BezierCurve> bezierCurves = new ArrayList<>();
     private Optional<Circle> tempCircle = Optional.empty();
     private Optional<Line> tempLineStart = Optional.empty();
     private Optional<Line> tempLineEnd = Optional.empty();
-    private Circle lastAddedCircle;
     private static Controller instance;
 
     @FXML
@@ -102,11 +102,10 @@ public class Controller {
         canvasHolder.setOnMouseClicked(event -> {
             if (!tempCircle.isPresent()) {
                 Point point = new Point(event.getX(), event.getY());
-                Circle circle = new Circle(point, 5);
+                Circle circle = new Circle(point, CIRCLE_RADIUS);
                 circle.drawCircle();
                 canvasCircles.add(circle);
                 tempCircles.add(circle);
-                lastAddedCircle = circle;
 
                 if (tempCircles.size() == 3) {
                     BezierCurve bezierCurve = new QuadraticBezier(tempCircles);
@@ -132,7 +131,7 @@ public class Controller {
         canvasHolder.setOnMouseReleased(event -> {
             if (!tempCircle.isPresent()) {
                 if (!canvasCircles.isEmpty()) {
-                    Point center = lastAddedCircle.getCenter();
+                    Point center = canvasCircles.get(canvasCircles.size() - 1).getCenter();
                     Line line = new Line(center, new Point(event.getX(), event.getY()));
                     line.drawLine();
                     lines.add(line);
@@ -146,37 +145,13 @@ public class Controller {
 
     private void drawBezier() {
         if (!bezierCurves.isEmpty()) {
-            ArrayList<Circle> temp;
-            BezierCurve tempBezier;
             for (int i=1; i<= bezierCurves.size(); i++) {
-                temp = new ArrayList<>();
-                tempBezier = bezierCurves.get(i-1);
-
-                if (tempBezier instanceof CubicBezier) {
-                    for (int j=(i*3)-3;j<((i*3)-3) + 4; j++) {
-                        if (j < canvasCircles.size()) {
-                            Circle circle = canvasCircles.get(j);
-                            temp.add(circle);
-                        }
-                    }
-                    BezierCurve bezier2 = new CubicBezier(temp);
-                    tempBezier.remove();
-                    bezierCurves.add(i-1, bezier2);
-                    bezierCurves.remove(tempBezier);
-                    bezier2.draw();
-                } else if (tempBezier instanceof QuadraticBezier) {
-                    for (int j=(i*3)-3;j<((i*3)-3) + 3; j++) {
-                        if (j < canvasCircles.size()) {
-                            Circle circle = canvasCircles.get(j);
-                            temp.add(circle);
-                        }
-                    }
-                    BezierCurve bezier2 = new QuadraticBezier(temp);
-                    tempBezier.remove();
-                    bezierCurves.add(i-1, bezier2);
-                    bezierCurves.remove(tempBezier);
-                    bezier2.draw();
-                }
+                BezierCurve tempBezier = bezierCurves.get(i-1);
+                BezierCurve newCurve = tempBezier.newCurve(i, canvasCircles);
+                tempBezier.remove();
+                bezierCurves.add(i-1, newCurve);
+                bezierCurves.remove(tempBezier);
+                newCurve.draw();
             }
         }
     }

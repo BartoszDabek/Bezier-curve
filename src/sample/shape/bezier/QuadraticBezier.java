@@ -2,6 +2,7 @@ package sample.shape.bezier;
 
 import sample.shape.Circle;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class QuadraticBezier extends BezierCurve {
@@ -10,6 +11,19 @@ public final class QuadraticBezier extends BezierCurve {
         super(points);
     }
 
+    @Override
+    public BezierCurve newCurve(int i, List<Circle> canvasCircles) {
+        ArrayList<Circle> temp = new ArrayList<>();
+        for (int j = (i * 3) - 3; j < ((i * 3) - 3) + 3; j++) {
+            if (j < canvasCircles.size()) {
+                Circle circle = canvasCircles.get(j);
+                temp.add(circle);
+            }
+        }
+        return new QuadraticBezier(temp);
+    }
+
+    @Override
     int xValueAt(double t) {
         double sum = 0;
 
@@ -20,6 +34,7 @@ public final class QuadraticBezier extends BezierCurve {
         return (int) sum;
     }
 
+    @Override
     int yValueAt(double t) {
         double sum = 0;
 

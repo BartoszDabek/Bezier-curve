@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 public abstract class BezierCurve extends AbstractShape {
 
+    private static final int LINE_WIDTH = 3;
     private final List<Point> points;
 
     BezierCurve(List<Circle> points) {
@@ -36,6 +37,7 @@ public abstract class BezierCurve extends AbstractShape {
 
         GraphicsContext gc = getCanvas().getGraphicsContext2D();
         Controller.getInstance().getCanvasHolder().getChildren().add(getCanvas());
+        gc.setLineWidth(LINE_WIDTH);
         gc.setStroke(Color.ORANGE);
         gc.strokePolyline(xPoints, yPoints, iterations);
     }
@@ -44,6 +46,8 @@ public abstract class BezierCurve extends AbstractShape {
         Controller.getInstance().getCanvasHolder().getChildren().remove(getCanvas());
         getCanvas().getGraphicsContext2D().clearRect(0, 0, OFFSET_WIDTH, OFFSET_HEIGHT);
     }
+
+    public abstract BezierCurve newCurve(int i, List<Circle> canvasCircles);
 
     abstract int xValueAt(double t);
 
