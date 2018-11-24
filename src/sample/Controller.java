@@ -6,11 +6,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.CubicCurveTo;
 import sample.shape.bezier.BezierCurve;
 import sample.shape.Circle;
 import sample.shape.Line;
 import sample.shape.Point;
 import sample.shape.bezier.CubicBezier;
+import sample.shape.bezier.QuadraticBezier;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -106,7 +108,16 @@ public class Controller {
                 tempCircles.add(circle);
                 lastAddedCircle = circle;
 
-                if (tempCircles.size() > 3) {
+                if (tempCircles.size() == 3) {
+                    BezierCurve bezierCurve = new QuadraticBezier(tempCircles);
+                    bezierCurves.add(bezierCurve);
+                    bezierCurve.draw();
+                } else if (tempCircles.size() > 3) {
+                    BezierCurve bezierCurve1 = bezierCurves.get(bezierCurves.size() - 1);
+                    bezierCurve1.remove();
+                    bezierCurves.remove(bezierCurve1);
+
+
                     BezierCurve bezierCurve = new CubicBezier(tempCircles);
                     bezierCurves.add(bezierCurve);
                     bezierCurve.draw();
@@ -140,18 +151,32 @@ public class Controller {
             for (int i=1; i<= bezierCurves.size(); i++) {
                 temp = new ArrayList<>();
                 tempBezier = bezierCurves.get(i-1);
-                for (int j=(i*3)-3;j<((i*3)-3) + 4; j++) {
-                    if (j < canvasCircles.size()) {
-                        Circle circle = canvasCircles.get(j);
-                        temp.add(circle);
-                    }
-                }
 
-                BezierCurve bezier2 = new CubicBezier(temp);
-                tempBezier.remove();
-                bezierCurves.add(i-1, bezier2);
-                bezierCurves.remove(tempBezier);
-                bezier2.draw();
+                if (tempBezier instanceof CubicBezier) {
+                    for (int j=(i*3)-3;j<((i*3)-3) + 4; j++) {
+                        if (j < canvasCircles.size()) {
+                            Circle circle = canvasCircles.get(j);
+                            temp.add(circle);
+                        }
+                    }
+                    BezierCurve bezier2 = new CubicBezier(temp);
+                    tempBezier.remove();
+                    bezierCurves.add(i-1, bezier2);
+                    bezierCurves.remove(tempBezier);
+                    bezier2.draw();
+                } else if (tempBezier instanceof QuadraticBezier) {
+                    for (int j=(i*3)-3;j<((i*3)-3) + 3; j++) {
+                        if (j < canvasCircles.size()) {
+                            Circle circle = canvasCircles.get(j);
+                            temp.add(circle);
+                        }
+                    }
+                    BezierCurve bezier2 = new QuadraticBezier(temp);
+                    tempBezier.remove();
+                    bezierCurves.add(i-1, bezier2);
+                    bezierCurves.remove(tempBezier);
+                    bezier2.draw();
+                }
             }
         }
     }
