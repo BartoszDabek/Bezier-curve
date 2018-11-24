@@ -6,27 +6,26 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import sample.shape.BezierCurve;
+import sample.shape.bezier.BezierCurve;
 import sample.shape.Circle;
 import sample.shape.Line;
 import sample.shape.Point;
+import sample.shape.bezier.CubicBezier;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class Controller {
 
     private static final double MAIN_WIDTH = 1200;
     private static final double MAIN_HEIGHT = 600;
-    private ArrayList<Circle> circles = new ArrayList<>();
+    private ArrayList<Circle> canvasCircles = new ArrayList<>();
     private ArrayList<Circle> tempCircles = new ArrayList<>();
     private ArrayList<Line> lines = new ArrayList<>();
     private ArrayList<BezierCurve> bezierCurves = new ArrayList<>();
     private Optional<Circle> tempCircle = Optional.empty();
     private Optional<Line> tempLineStart = Optional.empty();
     private Optional<Line> tempLineEnd = Optional.empty();
-    private Optional<BezierCurve> tempBezier = Optional.empty();
     private Circle lastAddedCircle;
     private static Controller instance;
 
@@ -77,7 +76,7 @@ public class Controller {
             if (!tempCircle.isPresent()) {
 
 
-                for (Circle circle : circles) {
+                for (Circle circle : canvasCircles) {
                     if (Math.abs(event.getX() - circle.getCenter().getX()) < 10 &&
                             Math.abs(event.getY() - circle.getCenter().getY()) < 10) {
                         tempCircle = Optional.of(circle);
@@ -103,12 +102,12 @@ public class Controller {
                 Point point = new Point(event.getX(), event.getY());
                 Circle circle = new Circle(point, 5);
                 circle.drawCircle();
-                circles.add(circle);
+                canvasCircles.add(circle);
                 tempCircles.add(circle);
                 lastAddedCircle = circle;
 
                 if (tempCircles.size() > 3) {
-                    BezierCurve bezierCurve = new BezierCurve(tempCircles);
+                    BezierCurve bezierCurve = new CubicBezier(tempCircles);
                     bezierCurves.add(bezierCurve);
                     bezierCurve.draw();
                     Circle circle1 = tempCircles.get(3);
@@ -121,7 +120,7 @@ public class Controller {
 
         canvasHolder.setOnMouseReleased(event -> {
             if (!tempCircle.isPresent()) {
-                if (!circles.isEmpty()) {
+                if (!canvasCircles.isEmpty()) {
                     Point center = lastAddedCircle.getCenter();
                     Line line = new Line(center, new Point(event.getX(), event.getY()));
                     line.drawLine();
@@ -136,20 +135,19 @@ public class Controller {
 
     private void drawBezier() {
         if (!bezierCurves.isEmpty()) {
-            tempBezier.ifPresent(BezierCurve::remove);
             ArrayList<Circle> temp;
             BezierCurve tempBezier;
             for (int i=1; i<= bezierCurves.size(); i++) {
                 temp = new ArrayList<>();
                 tempBezier = bezierCurves.get(i-1);
                 for (int j=(i*3)-3;j<((i*3)-3) + 4; j++) {
-                    if (j < circles.size()) {
-                        Circle circle = circles.get(j);
+                    if (j < canvasCircles.size()) {
+                        Circle circle = canvasCircles.get(j);
                         temp.add(circle);
                     }
                 }
 
-                BezierCurve bezier2 = new BezierCurve(temp);
+                BezierCurve bezier2 = new CubicBezier(temp);
                 tempBezier.remove();
                 bezierCurves.add(i-1, bezier2);
                 bezierCurves.remove(tempBezier);

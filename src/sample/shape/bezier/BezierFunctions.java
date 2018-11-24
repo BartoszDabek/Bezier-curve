@@ -1,4 +1,4 @@
-package sample.shape;
+package sample.shape.bezier;
 
 class BezierFunctions {
 
