@@ -11,22 +11,20 @@ import sample.shape.Line;
 import sample.shape.Point;
 import sample.shape.bezier.BezierChain;
 import sample.shape.bezier.BezierCurve;
+import sample.shape.util.ShapeSelector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class Controller {
 
     private static final double MAIN_WIDTH = 1200;
     private static final double MAIN_HEIGHT = 600;
     private static final int CIRCLE_RADIUS = 5;
-    private List<Circle> canvasCircles = new ArrayList<>();
-    private List<Line> lines = new ArrayList<>();
-    private Optional<Circle> tempCircle = Optional.empty();
-    private Optional<Line> tempLineStart = Optional.empty();
-    private Optional<Line> tempLineEnd = Optional.empty();
     private static Controller instance;
+    private List<Circle> circles = new ArrayList<>();
+    private List<Line> lines = new ArrayList<>();
+    private ShapeSelector shapeSelector = new ShapeSelector();
     private BezierChain bezierChain = new BezierChain();
 
     @FXML
@@ -55,17 +53,17 @@ public class Controller {
             drawBezier();
 
 
-            tempCircle.ifPresent(circle -> {
+            shapeSelector.getCircle().ifPresent(circle -> {
                 circle.setCenter(new Point(event.getX(), event.getY()));
                 circle.redraw();
 
-                tempLineStart.ifPresent(line -> {
+                shapeSelector.getStartingLine().ifPresent(line -> {
                     line.setStart(new Point(event.getX(), event.getY()));
                     line.redraw();
                 });
 
 
-                tempLineEnd.ifPresent(line -> {
+                shapeSelector.getEndLine().ifPresent(line -> {
                     line.setEnd(new Point(event.getX(), event.getY()));
                     line.redraw();
                 });
@@ -73,63 +71,41 @@ public class Controller {
         });
 
         canvasHolder.setOnMousePressed(event -> {
-            if (!tempCircle.isPresent()) {
-
-
-                for (Circle circle : canvasCircles) {
-                    if (Math.abs(event.getX() - circle.getCenter().getX()) < 10 &&
-                            Math.abs(event.getY() - circle.getCenter().getY()) < 10) {
-                        tempCircle = Optional.of(circle);
-                    }
-                }
-
-                for (Line line : lines) {
-                    if (Math.abs(event.getX() - line.getStart().getX()) < 10 &&
-                            Math.abs(event.getY() - line.getStart().getY()) < 10) {
-                        tempLineStart = Optional.of(line);
-                    }
-
-                    if (Math.abs(event.getX() - line.getEnd().getX()) < 10 &&
-                            Math.abs(event.getY() - line.getEnd().getY()) < 10) {
-                        tempLineEnd = Optional.of(line);
-                    }
-                }
+            if (!shapeSelector.isCirclePresent()) {
+                shapeSelector.setCircle(circles, event);
+                shapeSelector.setLines(lines, event);
             }
         });
 
         canvasHolder.setOnMouseClicked(event -> {
-            if (!tempCircle.isPresent()) {
+            if (!shapeSelector.isCirclePresent()) {
                 Point point = new Point(event.getX(), event.getY());
                 Circle circle = new Circle(point, CIRCLE_RADIUS);
                 circle.drawCircle();
-                canvasCircles.add(circle);
+                circles.add(circle);
                 bezierChain.createCurveIfPossible(circle);
             }
-            tempCircle = Optional.empty();
+            shapeSelector.setCircleToEmpty();
         });
 
         canvasHolder.setOnMouseReleased(event -> {
-            if (!tempCircle.isPresent()) {
-                if (!canvasCircles.isEmpty()) {
-                    Point center = canvasCircles.get(canvasCircles.size() - 1).getCenter();
-                    Line line = new Line(center, new Point(event.getX(), event.getY()));
-                    line.drawLine();
-                    lines.add(line);
-                }
+            if (!(shapeSelector.isCirclePresent() || circles.isEmpty())) {
+                Point center = circles.get(circles.size() - 1).getCenter();
+                Line line = new Line(center, new Point(event.getX(), event.getY()));
+                line.drawLine();
+                lines.add(line);
             }
-
-            tempLineStart = Optional.empty();
-            tempLineEnd = Optional.empty();
+            shapeSelector.setLinesToEmpty();
         });
     }
 
     private void drawBezier() {
         if (!bezierChain.getBezierCurves().isEmpty()) {
-            for (int i=1; i<= bezierChain.getBezierCurves().size(); i++) {
-                BezierCurve tempBezier = bezierChain.getBezierCurves().get(i-1);
-                BezierCurve newCurve = tempBezier.newCurve(i, canvasCircles);
+            for (int i = 1; i <= bezierChain.getBezierCurves().size(); i++) {
+                BezierCurve tempBezier = bezierChain.getBezierCurves().get(i - 1);
+                BezierCurve newCurve = tempBezier.newCurve(i, circles);
                 tempBezier.remove();
-                bezierChain.getBezierCurves().add(i-1, newCurve);
+                bezierChain.getBezierCurves().add(i - 1, newCurve);
                 bezierChain.getBezierCurves().remove(tempBezier);
                 newCurve.draw();
             }
