@@ -135,6 +135,16 @@ public class Controller {
         }
     }
 
+    @FXML
+    public void getPointToModify() {
+
+    }
+
+    @FXML
+    public void modifyPoint() {
+
+    }
+
     private static void setInstance(Controller instance) {
         Controller.instance = instance;
     }
