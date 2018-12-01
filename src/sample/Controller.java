@@ -5,6 +5,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import sample.shape.Circle;
@@ -34,7 +35,10 @@ public class Controller {
     @FXML
     private Label coordinates;
     @FXML
-    private TextField labelPointX, labelPointY;
+    private TextField newPointX, newPointY;
+    @FXML
+    private TextField pointPosition, modifyPointX, modifyPointY;
+
 
     @FXML
     public void initialize() {
@@ -53,29 +57,13 @@ public class Controller {
         canvasHolder.setOnMouseDragged(event -> {
             coordinates.setText("X: " + event.getX() + "  Y: " + event.getY());
             drawBezier();
-
-
-            shapeSelector.getCircle().ifPresent(circle -> {
-                circle.setCenter(new Point(event.getX(), event.getY()));
-                circle.redraw();
-
-                shapeSelector.getStartingLine().ifPresent(line -> {
-                    line.setStart(new Point(event.getX(), event.getY()));
-                    line.redraw();
-                });
-
-
-                shapeSelector.getEndLine().ifPresent(line -> {
-                    line.setEnd(new Point(event.getX(), event.getY()));
-                    line.redraw();
-                });
-            });
+            redrawPoint(event.getX(), event.getY());
         });
 
         canvasHolder.setOnMousePressed(event -> {
             if (!shapeSelector.isCirclePresent()) {
                 shapeSelector.setCircle(circles, event);
-                shapeSelector.setLines(lines, event);
+                shapeSelector.setLines(lines, event.getX(), event.getY());
             }
         });
 
@@ -99,6 +87,23 @@ public class Controller {
                 newCurve.draw();
             }
         }
+    }
+
+    private void redrawPoint(double x, double y) {
+        shapeSelector.getCircle().ifPresent(circle -> {
+            circle.setCenter(new Point(x, y));
+            circle.redraw();
+
+            shapeSelector.getStartingLine().ifPresent(line -> {
+                line.setStart(new Point(x, y));
+                line.redraw();
+            });
+
+            shapeSelector.getEndLine().ifPresent(line -> {
+                line.setEnd(new Point(x, y));
+                line.redraw();
+            });
+        });
     }
 
     private void addPointWithLineToCanvas(double x, double y) {
@@ -126,8 +131,8 @@ public class Controller {
 
     @FXML
     public void addNewPoint() {
-        String pointX = labelPointX.getText().trim();
-        String pointY = labelPointY.getText().trim();
+        String pointX = newPointX.getText().trim();
+        String pointY = newPointY.getText().trim();
         if (!pointX.isEmpty() && !pointY.isEmpty()) {
             double x = Double.parseDouble(pointX);
             double y = Double.parseDouble(pointY);
@@ -137,7 +142,15 @@ public class Controller {
 
     @FXML
     public void getPointToModify() {
+        String pointSequence = pointPosition.getText().trim();
+        Circle circle = circles.get(Integer.parseInt(pointSequence) - 1);
 
+        Point center = circle.getCenter();
+        modifyPointX.setText(String.valueOf((int) center.getX()));
+        modifyPointY.setText(String.valueOf((int) center.getY()));
+
+        shapeSelector.setCircle(circle);
+        shapeSelector.setLines(lines, center.getX(), center.getY());
     }
 
     @FXML

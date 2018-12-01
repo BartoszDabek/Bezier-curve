@@ -63,7 +63,7 @@
                   <HBox GridPane.rowIndex="1">
                      <children>
                         <Label alignment="CENTER" prefHeight="63.0" prefWidth="54.0" text="PointX" />
-                        <TextField fx:id="labelPointX" alignment="CENTER_RIGHT" prefHeight="72.0" prefWidth="48.0">
+                        <TextField fx:id="newPointX" alignment="CENTER_RIGHT" prefHeight="72.0" prefWidth="48.0">
                            <HBox.margin>
                               <Insets bottom="5.0" top="5.0" />
                            </HBox.margin>
@@ -73,7 +73,7 @@
                   <HBox GridPane.rowIndex="2">
                      <children>
                         <Label alignment="CENTER" prefHeight="63.0" prefWidth="54.0" text="PointY" />
-                        <TextField fx:id="labelPointY" alignment="CENTER_RIGHT" prefHeight="72.0" prefWidth="48.0">
+                        <TextField fx:id="newPointY" alignment="CENTER_RIGHT" prefHeight="72.0" prefWidth="48.0">
                            <HBox.margin>
                               <Insets bottom="5.0" top="5.0" />
                            </HBox.margin>
@@ -85,14 +85,14 @@
                   <Label prefHeight="42.0" prefWidth="100.0" text="Point to modify:" textAlignment="CENTER" GridPane.rowIndex="5" />
                   <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="6">
                      <children>
-                        <TextField fx:id="labelGetPoint" prefHeight="25.0" prefWidth="144.0" />
+                        <TextField fx:id="pointPosition" prefHeight="25.0" prefWidth="144.0" />
                      </children>
                   </HBox>
                   <Button mnemonicParsing="false" onAction="#getPointToModify" prefHeight="45.0" prefWidth="100.0" text="Get" GridPane.rowIndex="7" />
                   <HBox GridPane.rowIndex="8">
                      <children>
                         <Label alignment="CENTER" prefHeight="63.0" prefWidth="54.0" text="X" />
-                        <TextField fx:id="labelModifyX" alignment="CENTER_RIGHT" prefHeight="72.0" prefWidth="48.0">
+                        <TextField fx:id="modifyPointX" alignment="CENTER_RIGHT" prefHeight="72.0" prefWidth="48.0">
                            <HBox.margin>
                               <Insets bottom="5.0" top="5.0" />
                            </HBox.margin>
@@ -102,7 +102,7 @@
                   <HBox GridPane.rowIndex="9">
                      <children>
                         <Label alignment="CENTER" prefHeight="63.0" prefWidth="54.0" text="Y" />
-                        <TextField fx:id="labelModifyY" alignment="CENTER_RIGHT" prefHeight="72.0" prefWidth="48.0">
+                        <TextField fx:id="modifyPointY" alignment="CENTER_RIGHT" prefHeight="72.0" prefWidth="48.0">
                            <HBox.margin>
                               <Insets bottom="5.0" top="5.0" />
                            </HBox.margin>

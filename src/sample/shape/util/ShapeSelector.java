@@ -49,15 +49,15 @@ public class ShapeSelector {
         return endLine;
     }
 
-    public void setLines(List<Line> canvasLines, MouseEvent event) {
+    public void setLines(List<Line> canvasLines, double x, double y) {
         for (Line line : canvasLines) {
-            if (Math.abs(event.getX() - line.getStart().getX()) < SELECT_RADIUS &&
-                    Math.abs(event.getY() - line.getStart().getY()) < SELECT_RADIUS) {
+            if (Math.abs(x - line.getStart().getX()) < SELECT_RADIUS &&
+                    Math.abs(y - line.getStart().getY()) < SELECT_RADIUS) {
                 this.startingLine = Optional.of(line);
             }
 
-            if (Math.abs(event.getX() - line.getEnd().getX()) < SELECT_RADIUS &&
-                    Math.abs(event.getY() - line.getEnd().getY()) < SELECT_RADIUS) {
+            if (Math.abs(x - line.getEnd().getX()) < SELECT_RADIUS &&
+                    Math.abs(y - line.getEnd().getY()) < SELECT_RADIUS) {
                 this.endLine = Optional.of(line);
             }
         }
@@ -68,4 +68,7 @@ public class ShapeSelector {
         this.endLine = Optional.empty();
     }
 
+    public void setCircle(Circle circle) {
+        this.circle = Optional.ofNullable(circle);
+    }
 }
