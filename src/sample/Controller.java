@@ -155,7 +155,17 @@ public class Controller {
 
     @FXML
     public void modifyPoint() {
+        redrawPoint(Double.parseDouble(modifyPointX.getText()), Double.parseDouble(modifyPointY.getText()));
+        drawBezier();
+        shapeSelector.setCircleToEmpty();
+        shapeSelector.setLinesToEmpty();
+        clearInputs();
+    }
 
+    private void clearInputs() {
+        modifyPointX.clear();
+        modifyPointY.clear();
+        pointPosition.clear();
     }
 
     private static void setInstance(Controller instance) {
