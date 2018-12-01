@@ -21,7 +21,6 @@ public class Controller {
 
     private static final double MAIN_WIDTH = 1200;
     private static final double MAIN_HEIGHT = 600;
-    private static final int CIRCLE_RADIUS = 5;
     private static Controller instance;
     private List<Circle> circles = new ArrayList<>();
     private List<Line> lines = new ArrayList<>();
@@ -104,7 +103,7 @@ public class Controller {
 
     private void addPointWithLineToCanvas(double x, double y) {
         Point point = new Point(x, y);
-        Circle circle = new Circle(point, CIRCLE_RADIUS);
+        Circle circle = new Circle(point,circles.size() + 1);
         circle.drawCircle();
         circles.add(circle);
         bezierChain.createCurveIfPossible(circle);
